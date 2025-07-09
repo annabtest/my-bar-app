@@ -15,6 +15,7 @@ window.addEventListener('DOMContentLoaded', function() {
     const closeMapModal = document.getElementById('closeMapModal');
     const registerError = document.getElementById('registerError');
     const sendDrinkBtn = document.getElementById('sendDrinkBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
     let sendDrinkMode = false;
     let lastChosenTable = null;
 
@@ -235,6 +236,7 @@ window.addEventListener('DOMContentLoaded', function() {
                 isAdmin = false;
                 showMapModal();
                 afterLogin();
+                showLogoutBtn(true);
             }, 300);
         }
     });
@@ -252,6 +254,7 @@ window.addEventListener('DOMContentLoaded', function() {
             showAdminPanel();
             currentUser = 'admin';
             isAdmin = true;
+            showLogoutBtn(false);
             return;
         }
         // Regular user login
@@ -266,9 +269,32 @@ window.addEventListener('DOMContentLoaded', function() {
                 isAdmin = false;
                 showMapModal();
                 afterLogin();
+                showLogoutBtn(true);
             }, 300);
         } else {
             loginError.style.display = 'block';
         }
     });
+
+    function showLogoutBtn(show) {
+        if (logoutBtn) logoutBtn.style.display = show ? 'block' : 'none';
+    }
+
+    // Logout logic
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
+            localStorage.removeItem('demo_username');
+            localStorage.removeItem('demo_password');
+            currentUser = null;
+            isAdmin = false;
+            guiContainer.style.display = 'none';
+            adminPanel.style.display = 'none';
+            sendDrinkBtn.style.display = 'none';
+            logoutBtn.style.display = 'none';
+            authChoice.style.display = 'flex';
+            authContainer.style.display = 'block';
+            registerForm.style.display = 'none';
+            loginForm.style.display = 'none';
+        });
+    }
 }); 

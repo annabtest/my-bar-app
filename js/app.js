@@ -17,6 +17,7 @@ window.addEventListener('DOMContentLoaded', function() {
     const sendDrinkBtn = document.getElementById('sendDrinkBtn');
     const logoutBtn = document.getElementById('logoutBtn');
     const modalLogoutBtn = document.getElementById('modalLogoutBtn');
+    const receivedDrinkMsg = document.getElementById('receivedDrinkMsg');
     let sendDrinkMode = false;
     let lastChosenTable = null;
 
@@ -60,6 +61,13 @@ window.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Track drink sends
+    function recordDrinkSend(fromUser, toUser, table) {
+        let sends = JSON.parse(localStorage.getItem('drink_sends') || '[]');
+        sends.push({ from: fromUser, to: toUser, table });
+        localStorage.setItem('drink_sends', JSON.stringify(sends));
+    }
+
     // Table button logic (localStorage only)
     function updateTableButtons() {
         let assignments = JSON.parse(localStorage.getItem('table_assignments') || '{}');
@@ -86,6 +94,38 @@ window.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    function showReceivedDrinkMsg(table) {
+        if (receivedDrinkMsg) {
+            receivedDrinkMsg.textContent = `You received a drink from table: ${table}`;
+            receivedDrinkMsg.style.display = 'block';
+        }
+        guiContainer.style.display = 'none';
+        sendDrinkBtn.style.display = 'none';
+        mapModal.style.display = 'none';
+        adminPanel.style.display = 'none';
+    }
+
+    function attachModalLogoutListener() {
+        const modalLogoutBtn = document.getElementById('modalLogoutBtn');
+        if (modalLogoutBtn) {
+            modalLogoutBtn.onclick = function() {
+                localStorage.removeItem('demo_username');
+                localStorage.removeItem('demo_password');
+                currentUser = null;
+                isAdmin = false;
+                guiContainer.style.display = 'none';
+                adminPanel.style.display = 'none';
+                sendDrinkBtn.style.display = 'none';
+                logoutBtn.style.display = 'none';
+                mapModal.style.display = 'none';
+                authChoice.style.display = 'flex';
+                authContainer.style.display = 'block';
+                registerForm.style.display = 'none';
+                loginForm.style.display = 'none';
+            };
+        }
+    }
+
     document.querySelectorAll('.map-btn').forEach(function(btn) {
         btn.addEventListener('click', function() {
             const tableText = this.textContent.trim();
@@ -97,11 +137,17 @@ window.addEventListener('DOMContentLoaded', function() {
                     let drinks = JSON.parse(localStorage.getItem('drinks_for_' + recipient) || '[]');
                     drinks.push(lastChosenTable);
                     localStorage.setItem('drinks_for_' + recipient, JSON.stringify(drinks));
+                    // Set sent drink flag for current user
+                    if (currentUser) localStorage.setItem('sent_drink_for_' + currentUser, '1');
+                    // Record drink send
+                    if (currentUser) recordDrinkSend(currentUser, recipient, tableText);
                     alert('Drink sent to ' + recipient + ' at ' + tableText + '!');
+                    // showBraveMsg(true); // Removed as per edit hint
                 }
                 sendDrinkMode = false;
                 mapModal.style.display = 'none';
                 updateTableButtons();
+                attachModalLogoutListener();
                 return;
             }
             if (!isAdmin && currentUser) {
@@ -125,6 +171,7 @@ window.addEventListener('DOMContentLoaded', function() {
             sendDrinkMode = true;
             mapModal.style.display = 'flex';
             updateTableButtons();
+            attachModalLogoutListener();
         });
     }
 
@@ -132,31 +179,14 @@ window.addEventListener('DOMContentLoaded', function() {
         mapModal.style.display = 'flex';
         sendDrinkMode = false;
         updateTableButtons();
-        // Attach modal logout event listener every time modal is shown
-        const modalLogoutBtn = document.getElementById('modalLogoutBtn');
-        if (modalLogoutBtn) {
-            modalLogoutBtn.onclick = function() {
-                localStorage.removeItem('demo_username');
-                localStorage.removeItem('demo_password');
-                currentUser = null;
-                isAdmin = false;
-                guiContainer.style.display = 'none';
-                adminPanel.style.display = 'none';
-                sendDrinkBtn.style.display = 'none';
-                logoutBtn.style.display = 'none';
-                mapModal.style.display = 'none';
-                authChoice.style.display = 'flex';
-                authContainer.style.display = 'block';
-                registerForm.style.display = 'none';
-                loginForm.style.display = 'none';
-            };
-        }
+        attachModalLogoutListener();
     }
 
     closeMapModal.addEventListener('click', function() {
         mapModal.style.display = 'none';
         sendDrinkMode = false;
         updateTableButtons();
+        attachModalLogoutListener();
     });
 
     mapModal.addEventListener('click', function(e) {
@@ -164,6 +194,7 @@ window.addEventListener('DOMContentLoaded', function() {
             mapModal.style.display = 'none';
             sendDrinkMode = false;
             updateTableButtons();
+            attachModalLogoutListener();
         }
     });
 
@@ -171,6 +202,7 @@ window.addEventListener('DOMContentLoaded', function() {
     function showAdminPanel() {
         let assignments = JSON.parse(localStorage.getItem('table_assignments') || '{}');
         let users = JSON.parse(localStorage.getItem('demo_users') || '{}');
+        let sends = JSON.parse(localStorage.getItem('drink_sends') || '[]');
         let html = '<button id="deleteAllBtn" style="background:#d84315;color:#fff;padding:10px 24px;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;margin-bottom:24px;">Delete All Users and Choices</button>';
         html += '<h2>User Table Assignments</h2>';
         if (Object.keys(assignments).length === 0) {
@@ -194,6 +226,18 @@ window.addEventListener('DOMContentLoaded', function() {
             }
             html += '</table>';
         }
+        // Show drink sends
+        html += '<h2 style="margin-top:32px;">Drink Sends</h2>';
+        html += '<table style="width:100%;border-collapse:collapse;">';
+        html += '<tr><th style="text-align:left;padding:8px;border-bottom:1px solid #ccc;">From User</th><th style="text-align:left;padding:8px;border-bottom:1px solid #ccc;">To User</th><th style="text-align:left;padding:8px;border-bottom:1px solid #ccc;">Table</th></tr>';
+        if (sends.length === 0) {
+            html += '<tr><td colspan="3" style="padding:8px;text-align:center;color:#888;">No drinks have been sent yet.</td></tr>';
+        } else {
+            sends.forEach(s => {
+                html += `<tr><td style="padding:8px;border-bottom:1px solid #eee;">${s.from}</td><td style="padding:8px;border-bottom:1px solid #eee;">${s.to}</td><td style="padding:8px;border-bottom:1px solid #eee;">${s.table}</td></tr>`;
+            });
+        }
+        html += '</table>';
         adminPanel.innerHTML = html;
         // Re-attach deleteAllBtn event listener
         const deleteAllBtn = document.getElementById('deleteAllBtn');
@@ -204,6 +248,7 @@ window.addEventListener('DOMContentLoaded', function() {
                     localStorage.removeItem('table_assignments');
                     localStorage.removeItem('demo_username');
                     localStorage.removeItem('demo_password');
+                    localStorage.removeItem('drink_sends');
                     showAdminPanel();
                 }
             });
@@ -226,7 +271,19 @@ window.addEventListener('DOMContentLoaded', function() {
 
     // Show drink notification on login
     function afterLogin() {
-        showDrinkNotification();
+        // If user received a drink, show only that message
+        if (currentUser && currentUser !== 'admin') {
+            const drinks = JSON.parse(localStorage.getItem('drinks_for_' + currentUser) || '[]');
+            if (drinks.length > 0) {
+                showReceivedDrinkMsg(drinks[drinks.length - 1]);
+                localStorage.setItem('drinks_for_' + currentUser, '[]');
+                return;
+            }
+        }
+        // Otherwise, show the main GUI and map modal
+        guiContainer.style.display = 'flex';
+        mapModal.style.display = 'flex';
+        if (receivedDrinkMsg) receivedDrinkMsg.style.display = 'none';
     }
 
     // Registration and login logic using localStorage only

@@ -2,10 +2,41 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0;
     background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 0 4vw;
+    }
+    .name {
+        font-size: 2rem;
+        padding: 20px 10vw;
+    }
+    #authChoice, #authContainer, #adminPanel, #guiContainer {
+        max-width: 98vw;
+        min-width: 0;
+    }
+    .modal-content {
+        max-width: 98vw;
+        min-width: 0;
+    }
+    .modal-map-img {
+        max-width: 95vw;
+        max-height: 45vh;
+    }
+    form {
+        padding: 16px;
+    }
+    #trademark {
+        font-size: 0.9rem;
+        left: 8px;
+        top: 8px;
+        padding: 4px 10px;
+    }
 }
 
 .name {
@@ -30,15 +61,16 @@ body {
     margin-bottom: 24px;
 }
 
-#chooseRegister, #chooseLogin {
+#chooseRegister, #chooseLogin, #sendDrinkBtn, #deleteAllBtn {
     width: 100%;
-    padding: 12px;
+    padding: 16px;
     margin-bottom: 12px;
     border: none;
     border-radius: 6px;
     font-size: 1.1rem;
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
+    box-sizing: border-box;
 }
 
 #chooseRegister {
@@ -75,13 +107,14 @@ form {
 form input[type="text"],
 form input[type="password"] {
     width: 100%;
-    padding: 10px;
+    padding: 14px;
     margin-bottom: 10px;
     border: 1px solid #ffb47b;
     border-radius: 5px;
     background: #fff7f0;
     color: #a14a00;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    box-sizing: border-box;
 }
 
 form input[type="text"]:focus,
@@ -93,7 +126,7 @@ form input[type="password"]:focus {
 
 form button[type="submit"] {
     width: 100%;
-    padding: 10px;
+    padding: 14px;
     background: linear-gradient(90deg, #ff9966 0%, #ff5e62 100%);
     color: white;
     border: none;
@@ -136,31 +169,27 @@ form button[type="submit"]:hover {
     background: linear-gradient(90deg, #ff5e62 0%, #ff9966 100%);
 }
 
-a {
-    color: #ff7e5f;
-    text-decoration: underline;
-    transition: color 0.2s;
+#sendDrinkBtn {
+    background: linear-gradient(90deg, #ffb74d 0%, #ff9800 100%);
+    color: #fff;
+    font-size: 1.2rem;
+    margin-top: 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 16px rgba(255,183,77,0.15);
+}
+#sendDrinkBtn:hover {
+    background: linear-gradient(90deg, #ff9800 0%, #ffb74d 100%);
 }
 
-a:hover {
-    color: #d84315;
-}
-
-#trademark {
-    position: fixed;
-    top: 18px;
-    left: 32px;
-    font-size: 1.05rem;
-    color: #b85c38;
-    background: rgba(255, 255, 255, 0.7);
-    padding: 6px 18px;
+#adminPanel {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    background: rgba(255, 248, 240, 0.98);
     border-radius: 16px;
-    box-shadow: 0 2px 8px rgba(252, 182, 159, 0.10);
-    letter-spacing: 1px;
-    z-index: 1000;
-    font-weight: 500;
-    pointer-events: none;
-    user-select: none;
+    box-shadow: 0 4px 16px rgba(252, 182, 159, 0.10);
+    padding: 24px;
+    overflow-x: auto;
 }
 
 .modal {
@@ -189,6 +218,7 @@ a:hover {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+    overflow-x: auto;
 }
 
 .close {
@@ -238,4 +268,31 @@ a:hover {
     pointer-events: none !important;
     border: 2px solid #ffd700;
     opacity: 0.85;
+}
+
+a {
+    color: #ff7e5f;
+    text-decoration: underline;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #d84315;
+}
+
+#trademark {
+    position: fixed;
+    top: 18px;
+    left: 32px;
+    font-size: 1.05rem;
+    color: #b85c38;
+    background: rgba(255, 255, 255, 0.7);
+    padding: 6px 18px;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(252, 182, 159, 0.10);
+    letter-spacing: 1px;
+    z-index: 1000;
+    font-weight: 500;
+    pointer-events: none;
+    user-select: none;
 } 

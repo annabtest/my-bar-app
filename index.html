@@ -7,6 +7,13 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <header id="mainHeader" style="background:#23232b;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:12px 20px 12px 12px;box-shadow:0 2px 8px rgba(0,0,0,0.08);position:fixed;top:0;left:0;width:100vw;z-index:1100;">
+      <div style="display:flex;align-items:center;font-size:1.6rem;font-weight:700;gap:10px;">
+        <span style="font-size:2rem;">🧑‍🤝‍🧑</span> Mally connection people
+      </div>
+      <button id="headerLogoutBtn" style="background:#ff5e62;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:1rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(255,94,98,0.10);display:none;">Logout</button>
+    </header>
+    <main id="mainContent" style="margin-top:70px;margin-bottom:80px;">
     <div id="authChoice">
         <button id="chooseRegister">Register</button>
         <button id="chooseLogin">Login</button>
@@ -40,6 +47,7 @@
     <div id="mapModal" class="modal">
         <div class="modal-content">
             <span class="close" id="closeMapModal">&times;</span>
+            <button id="modalLogoutBtn" style="background:#d84315;color:#fff;border:none;border-radius:8px;padding:4px 14px;font-size:1rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(216,67,21,0.10);margin-right:12px;float:right;">Logout</button>
             <div style="position:relative; display:inline-block; width:100%;">
                 <img src="images/map.png" alt="Bar Map" class="modal-map-img">
                 <button class="map-btn" style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);">table 1</button>
@@ -49,6 +57,13 @@
             </div>
         </div>
     </div>
+    </main>
+    <nav id="bottomNav" style="position:fixed;bottom:0;left:0;width:100vw;height:64px;background:#23232b;display:flex;justify-content:space-around;align-items:center;z-index:1100;box-shadow:0 -2px 8px rgba(0,0,0,0.08);">
+      <div class="nav-item" id="navHome" style="display:flex;flex-direction:column;align-items:center;color:#fff;font-size:1.2rem;cursor:pointer;"><span>🏠</span><span style="font-size:0.9rem;">Home</span></div>
+      <div class="nav-item" id="navJoin" style="display:flex;flex-direction:column;align-items:center;color:#fff;font-size:1.2rem;cursor:pointer;"><span>🔗</span><span style="font-size:0.9rem;">Join</span></div>
+      <div class="nav-item" id="navCreate" style="display:flex;flex-direction:column;align-items:center;color:#fff;font-size:1.2rem;cursor:pointer;"><span>➕</span><span style="font-size:0.9rem;">Create</span></div>
+      <div class="nav-item" id="navLibrary" style="display:flex;flex-direction:column;align-items:center;color:#fff;font-size:1.2rem;cursor:pointer;"><span>📚</span><span style="font-size:0.9rem;">Library</span></div>
+    </nav>
     <script src="js/app.js"></script>
 </body>
 </html> 

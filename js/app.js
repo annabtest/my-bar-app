@@ -16,6 +16,7 @@ window.addEventListener('DOMContentLoaded', function() {
     const registerError = document.getElementById('registerError');
     const sendDrinkBtn = document.getElementById('sendDrinkBtn');
     const logoutBtn = document.getElementById('logoutBtn');
+    const modalLogoutBtn = document.getElementById('modalLogoutBtn');
     let sendDrinkMode = false;
     let lastChosenTable = null;
 
@@ -131,6 +132,25 @@ window.addEventListener('DOMContentLoaded', function() {
         mapModal.style.display = 'flex';
         sendDrinkMode = false;
         updateTableButtons();
+        // Attach modal logout event listener every time modal is shown
+        const modalLogoutBtn = document.getElementById('modalLogoutBtn');
+        if (modalLogoutBtn) {
+            modalLogoutBtn.onclick = function() {
+                localStorage.removeItem('demo_username');
+                localStorage.removeItem('demo_password');
+                currentUser = null;
+                isAdmin = false;
+                guiContainer.style.display = 'none';
+                adminPanel.style.display = 'none';
+                sendDrinkBtn.style.display = 'none';
+                logoutBtn.style.display = 'none';
+                mapModal.style.display = 'none';
+                authChoice.style.display = 'flex';
+                authContainer.style.display = 'block';
+                registerForm.style.display = 'none';
+                loginForm.style.display = 'none';
+            };
+        }
     }
 
     closeMapModal.addEventListener('click', function() {
@@ -291,6 +311,25 @@ window.addEventListener('DOMContentLoaded', function() {
             adminPanel.style.display = 'none';
             sendDrinkBtn.style.display = 'none';
             logoutBtn.style.display = 'none';
+            authChoice.style.display = 'flex';
+            authContainer.style.display = 'block';
+            registerForm.style.display = 'none';
+            loginForm.style.display = 'none';
+        });
+    }
+
+    // Logout logic for modal
+    if (modalLogoutBtn) {
+        modalLogoutBtn.addEventListener('click', function() {
+            localStorage.removeItem('demo_username');
+            localStorage.removeItem('demo_password');
+            currentUser = null;
+            isAdmin = false;
+            guiContainer.style.display = 'none';
+            adminPanel.style.display = 'none';
+            sendDrinkBtn.style.display = 'none';
+            logoutBtn.style.display = 'none';
+            mapModal.style.display = 'none';
             authChoice.style.display = 'flex';
             authContainer.style.display = 'block';
             registerForm.style.display = 'none';

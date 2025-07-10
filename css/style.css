@@ -225,6 +225,11 @@ form button[type="submit"]:hover {
     overflow-x: auto;
 }
 
+#adminPanel, #adminPanel h2, #adminPanel th, #adminPanel td {
+    color: #f5f5f5 !important;
+    opacity: 1 !important;
+}
+
 .modal {
     display: none;
     position: fixed;

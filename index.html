@@ -37,8 +37,20 @@
             <div><a href="#" id="toRegister">Don't have an account? Register</a></div>
         </form>
     </div>
+    <section id="cameraSection" style="display:none;flex-direction:column;align-items:center;justify-content:center;margin:32px auto 0 auto;max-width:400px;">
+      <h2>Take your photo</h2>
+      <video id="cameraVideo" autoplay playsinline style="width:100%;max-width:320px;border-radius:12px;"></video>
+      <button id="takePhotoBtn" style="margin:16px 0 0 0;">Take Photo</button>
+      <canvas id="cameraCanvas" style="display:none;"></canvas>
+      <img id="capturedPhoto" style="display:none;margin-top:16px;border-radius:12px;max-width:320px;"/>
+      <button id="confirmPhotoBtn" style="display:none;margin-top:16px;">Confirm Photo</button>
+      <button id="retakePhotoBtn" style="display:none;margin-top:8px;">Retake</button>
+    </section>
+    <section id="userPhotosSection" style="display:none;flex-direction:column;align-items:center;justify-content:center;margin:32px auto 0 auto;max-width:600px;">
+      <h2>All User Photos</h2>
+      <div id="userPhotosGrid" style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center;"></div>
+    </section>
     <div id="guiContainer">
-        <button id="logoutBtn" style="display:none;margin:24px auto 0 auto;padding:12px 32px;font-size:1.1rem;border:none;border-radius:8px;background:#d84315;color:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(216,67,21,0.10);font-weight:600;">Logout</button>
     </div>
     <div id="receivedDrinkMsg" style="display:none;text-align:center;margin:40px auto 0 auto;font-size:1.5rem;font-weight:600;color:#2ecc40;max-width:90vw;"></div>
     <div id="braveMsg" style="display:none;text-align:center;margin:40px auto 0 auto;font-size:1.5rem;font-weight:600;color:#ff9800;max-width:90vw;">You are very brave. Now wait for a match.</div>
@@ -50,7 +62,6 @@
     <div id="mapModal" class="modal">
         <div class="modal-content">
             <span class="close" id="closeMapModal">&times;</span>
-            <button id="modalLogoutBtn" style="background:#d84315;color:#fff;border:none;border-radius:8px;padding:4px 14px;font-size:1rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(216,67,21,0.10);margin-right:12px;float:right;">Logout</button>
             <div style="position:relative; display:inline-block; width:100%;">
                 <img src="images/map.png" alt="Bar Map" class="modal-map-img">
                 <button class="map-btn" style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);">table 1</button>
@@ -60,11 +71,12 @@
             </div>
         </div>
     </div>
+    <div id="tableChoiceMsg" style="display:none;text-align:center;margin:24px auto 0 auto;font-size:1.3rem;font-weight:600;color:#5ac8fa;max-width:90vw;"></div>
     </main>
     <nav id="bottomNav" style="position:fixed;bottom:0;left:0;width:100vw;height:64px;background:#23232b;display:flex;justify-content:space-around;align-items:center;z-index:1100;box-shadow:0 -2px 8px rgba(0,0,0,0.08);">
       <div class="nav-item" id="navHome" style="display:flex;flex-direction:column;align-items:center;color:#fff;font-size:1.2rem;cursor:pointer;"><span>🏠</span><span style="font-size:0.9rem;">Home</span></div>
       <div class="nav-item" id="navJoin" style="display:flex;flex-direction:column;align-items:center;color:#fff;font-size:1.2rem;cursor:pointer;"><span>🔗</span><span style="font-size:0.9rem;">Join</span></div>
-      <div class="nav-item" id="navCreate" style="display:flex;flex-direction:column;align-items:center;color:#fff;font-size:1.2rem;cursor:pointer;"><span>➕</span><span style="font-size:0.9rem;">Create</span></div>
+      <div class="nav-item" id="navCreate" style="display:flex;flex-direction:column;align-items:center;color:#fff;font-size:1.2rem;cursor:pointer;"><span>🚪</span><span style="font-size:0.9rem;">Exit</span></div>
       <div class="nav-item" id="navLibrary" style="display:flex;flex-direction:column;align-items:center;color:#fff;font-size:1.2rem;cursor:pointer;"><span>📚</span><span style="font-size:0.9rem;">Who is here?</span></div>
     </nav>
     <script src="js/app.js"></script>

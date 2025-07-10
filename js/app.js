@@ -156,7 +156,13 @@ window.addEventListener('DOMContentLoaded', function() {
                 assignments[tableText] = currentUser;
                 localStorage.setItem('table_assignments', JSON.stringify(assignments));
                 lastChosenTable = tableText;
-                alert(`nice! your table is ${tableText}`);
+                // Show table choice message instead of alert
+                const tableChoiceMsg = document.getElementById('tableChoiceMsg');
+                if (tableChoiceMsg) {
+                    tableChoiceMsg.textContent = `Nice! Your table is ${tableText}`;
+                    tableChoiceMsg.style.display = 'block';
+                    setTimeout(() => { tableChoiceMsg.style.display = 'none'; }, 3000);
+                }
                 mapModal.style.display = 'none';
                 // Show send drink button
                 if (sendDrinkBtn && currentUser !== 'admin') {
@@ -286,6 +292,94 @@ window.addEventListener('DOMContentLoaded', function() {
         if (receivedDrinkMsg) receivedDrinkMsg.style.display = 'none';
     }
 
+    // Camera/photo logic
+    const cameraSection = document.getElementById('cameraSection');
+    const cameraVideo = document.getElementById('cameraVideo');
+    const takePhotoBtn = document.getElementById('takePhotoBtn');
+    const cameraCanvas = document.getElementById('cameraCanvas');
+    const capturedPhoto = document.getElementById('capturedPhoto');
+    const confirmPhotoBtn = document.getElementById('confirmPhotoBtn');
+    const retakePhotoBtn = document.getElementById('retakePhotoBtn');
+    const userPhotosSection = document.getElementById('userPhotosSection');
+    const userPhotosGrid = document.getElementById('userPhotosGrid');
+    let cameraStream = null;
+    let pendingPhotoDataUrl = null;
+
+    function showCameraSection() {
+        cameraSection.style.display = 'flex';
+        guiContainer.style.display = 'none';
+        mapModal.style.display = 'none';
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    cameraStream = stream;
+                    cameraVideo.srcObject = stream;
+                    cameraVideo.play();
+                })
+                .catch(function(err) {
+                    alert('Could not access camera: ' + err);
+                });
+        } else {
+            alert('Camera not supported on this device.');
+        }
+        capturedPhoto.style.display = 'none';
+        confirmPhotoBtn.style.display = 'none';
+        retakePhotoBtn.style.display = 'none';
+        takePhotoBtn.style.display = 'block';
+    }
+
+    function hideCameraSection() {
+        cameraSection.style.display = 'none';
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(track => track.stop());
+            cameraStream = null;
+        }
+    }
+
+    takePhotoBtn.onclick = function() {
+        cameraCanvas.width = cameraVideo.videoWidth;
+        cameraCanvas.height = cameraVideo.videoHeight;
+        cameraCanvas.getContext('2d').drawImage(cameraVideo, 0, 0);
+        pendingPhotoDataUrl = cameraCanvas.toDataURL('image/png');
+        capturedPhoto.src = pendingPhotoDataUrl;
+        capturedPhoto.style.display = 'block';
+        confirmPhotoBtn.style.display = 'block';
+        retakePhotoBtn.style.display = 'block';
+        takePhotoBtn.style.display = 'none';
+    };
+
+    retakePhotoBtn.onclick = function() {
+        capturedPhoto.style.display = 'none';
+        confirmPhotoBtn.style.display = 'none';
+        retakePhotoBtn.style.display = 'none';
+        takePhotoBtn.style.display = 'block';
+    };
+
+    confirmPhotoBtn.onclick = function() {
+        if (pendingPhotoDataUrl && currentUser) {
+            let userPhotos = JSON.parse(localStorage.getItem('user_photos') || '{}');
+            userPhotos[currentUser] = pendingPhotoDataUrl;
+            localStorage.setItem('user_photos', JSON.stringify(userPhotos));
+        }
+        hideCameraSection();
+        showMapModal();
+    };
+
+    // Show all user photos
+    function showUserPhotosSection() {
+        userPhotosSection.style.display = 'flex';
+        userPhotosGrid.innerHTML = '';
+        let userPhotos = JSON.parse(localStorage.getItem('user_photos') || '{}');
+        for (let user in userPhotos) {
+            const div = document.createElement('div');
+            div.style.display = 'flex';
+            div.style.flexDirection = 'column';
+            div.style.alignItems = 'center';
+            div.innerHTML = `<img src="${userPhotos[user]}" alt="${user}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;background:#23232b;"/><span style="margin-top:8px;color:#f5f5f5;font-size:1rem;">${user}</span>`;
+            userPhotosGrid.appendChild(div);
+        }
+    }
+
     // Registration and login logic using localStorage only
     registerForm.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -308,15 +402,39 @@ window.addEventListener('DOMContentLoaded', function() {
             loginForm.style.display = 'block';
             setTimeout(() => {
                 document.getElementById('authContainer').style.display = 'none';
-                guiContainer.style.display = 'flex';
+                guiContainer.style.display = 'none';
                 currentUser = username;
                 isAdmin = false;
-                showMapModal();
-                afterLogin();
+                showCameraSection();
                 showLogoutBtn(true);
             }, 300);
         }
     });
+
+    // Optionally, add a way to show all user photos (e.g., via nav)
+    // Example: document.getElementById('navLibrary').onclick = showUserPhotosSection;
+    const navLibrary = document.getElementById('navLibrary');
+    if (navLibrary) {
+        navLibrary.onclick = showUserPhotosSection;
+    }
+
+    function logout() {
+        localStorage.removeItem('demo_username');
+        localStorage.removeItem('demo_password');
+        currentUser = null;
+        isAdmin = false;
+        guiContainer.style.display = 'none';
+        adminPanel.style.display = 'none';
+        sendDrinkBtn.style.display = 'none';
+        logoutBtn.style.display = 'none';
+        mapModal.style.display = 'none';
+        authChoice.style.display = 'flex';
+        authContainer.style.display = 'block';
+        registerForm.style.display = 'none';
+        loginForm.style.display = 'none';
+        cameraSection.style.display = 'none';
+        userPhotosSection.style.display = 'none';
+    }
 
     loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -359,38 +477,13 @@ window.addEventListener('DOMContentLoaded', function() {
 
     // Logout logic
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', function() {
-            localStorage.removeItem('demo_username');
-            localStorage.removeItem('demo_password');
-            currentUser = null;
-            isAdmin = false;
-            guiContainer.style.display = 'none';
-            adminPanel.style.display = 'none';
-            sendDrinkBtn.style.display = 'none';
-            logoutBtn.style.display = 'none';
-            authChoice.style.display = 'flex';
-            authContainer.style.display = 'block';
-            registerForm.style.display = 'none';
-            loginForm.style.display = 'none';
-        });
+        logoutBtn.addEventListener('click', logout);
     }
-
-    // Logout logic for modal
     if (modalLogoutBtn) {
-        modalLogoutBtn.addEventListener('click', function() {
-            localStorage.removeItem('demo_username');
-            localStorage.removeItem('demo_password');
-            currentUser = null;
-            isAdmin = false;
-            guiContainer.style.display = 'none';
-            adminPanel.style.display = 'none';
-            sendDrinkBtn.style.display = 'none';
-            logoutBtn.style.display = 'none';
-            mapModal.style.display = 'none';
-            authChoice.style.display = 'flex';
-            authContainer.style.display = 'block';
-            registerForm.style.display = 'none';
-            loginForm.style.display = 'none';
-        });
+        modalLogoutBtn.addEventListener('click', logout);
+    }
+    const navCreate = document.getElementById('navCreate');
+    if (navCreate) {
+        navCreate.onclick = logout;
     }
 }); 
